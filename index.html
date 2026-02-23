@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ריפוי תת המודע</title>
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@300;400;700;900&family=Heebo:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --pink: #F8C8D4;
+    --pink-deep: #E8A0B0;
+    --mint: #B8E8D8;
+    --mint-deep: #7ECFB8;
+    --gold: #D4A843;
+    --gold-light: #F0CC78;
+    --cream: #FDF6F0;
+    --dark: #2C1A2E;
+    --text: #3D2440;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Heebo', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Stars background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      radial-gradient(circle, var(--gold-light) 1px, transparent 1px),
+      radial-gradient(circle, var(--pink) 1px, transparent 1px);
+    background-size: 80px 80px, 120px 120px;
+    background-position: 0 0, 40px 40px;
+    opacity: 0.15;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 30px 20px 60px;
+  }
+
+  /* HEADER */
+  .header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .header h1 {
+    font-family: 'Frank Ruhl Libre', serif;
+    font-size: 2.8rem;
+    font-weight: 900;
+    color: var(--dark);
+    letter-spacing: 1px;
+    line-height: 1.2;
+  }
+
+  .header h1 span {
+    color: var(--gold);
+  }
+
+  .header p {
+    margin-top: 8px;
+    font-size: 0.95rem;
+    color: var(--gold);
+    font-weight: 300;
+    letter-spacing: 3px;
+  }
+
+  /* GOLD DIVIDER */
+  .divider {
+    width: 60px;
+    height: 2px;
+    background: var(--gold);
+    margin: 14px auto;
+  }
+
+  /* PHOTO SECTION */
+  .photo-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 35px;
+  }
+
+  .photo-frame {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    border: 3px solid var(--gold);
+    overflow: hidden;
+    background: var(--pink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    transition: transform 0.3s;
+    box-shadow: 0 0 0 6px var(--pink), 0 0 0 8px var(--gold-light);
+  }
+
+  .photo-frame:hover { transform: scale(1.04); }
+
+  .photo-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: none;
+  }
+
+  .photo-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    color: var(--dark);
+    opacity: 0.6;
+    font-size: 0.8rem;
+  }
+
+  .photo-placeholder svg { width: 36px; height: 36px; }
+
+  #photoInput { display: none; }
+
+  .photo-label {
+    margin-top: 14px;
+    font-size: 0.82rem;
+    color: var(--gold);
+    letter-spacing: 2px;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  /* SUBCONSCIOUS BUTTON */
+  .subconscious-btn {
+    display: block;
+    width: 100%;
+    padding: 18px;
+    background: var(--pink-deep);
+    color: var(--dark);
+    border: 2px solid var(--pink-deep);
+    border-radius: 60px;
+    font-family: 'Frank Ruhl Libre', serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.3s;
+    margin-bottom: 14px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .subconscious-btn::after {
+    content: '✦';
+    position: absolute;
+    left: 22px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gold);
+    font-size: 1rem;
+    animation: pulse 2s infinite;
+  }
+
+  .subconscious-btn:hover {
+    background: var(--gold);
+    color: var(--dark);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(212, 168, 67, 0.35);
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: translateY(-50%) scale(1); }
+    50% { opacity: 0.4; transform: translateY(-50%) scale(1.3); }
+  }
+
+  /* SUBCONSCIOUS OVERLAY */
+  .subconscious-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: var(--dark);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .subconscious-overlay.active { display: flex; }
+
+  .sub-title {
+    font-family: 'Frank Ruhl Libre', serif;
+    font-size: 2rem;
+    color: var(--gold-light);
+    text-align: center;
+    animation: fadeIn 1s ease;
+  }
+
+  .sub-subtitle {
+    color: var(--pink);
+    font-size: 0.95rem;
+    letter-spacing: 3px;
+    animation: fadeIn 1.5s ease;
+    text-align: center;
+    padding: 0 30px;
+    line-height: 1.8;
+  }
+
+  .sub-photo {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 3px solid var(--gold);
+    object-fit: cover;
+    animation: glowPulse 2s infinite;
+    display: none;
+  }
+
+  @keyframes glowPulse {
+    0%, 100% { box-shadow: 0 0 10px var(--gold), 0 0 30px var(--gold); }
+    50% { box-shadow: 0 0 20px var(--gold-light), 0 0 60px var(--gold-light); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .close-overlay-btn {
+    margin-top: 10px;
+    padding: 12px 30px;
+    background: transparent;
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    border-radius: 30px;
+    font-family: 'Heebo', sans-serif;
+    font-size: 0.9rem;
+    cursor: pointer;
+    letter-spacing: 2px;
+    transition: all 0.3s;
+    animation: fadeIn 2s ease;
+  }
+
+  .close-overlay-btn:hover {
+    background: var(--gold);
+    color: var(--dark);
+  }
+
+  /* CARD */
+  .card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 26px;
+    margin-bottom: 22px;
+    border: 1.5px solid var(--pink-deep);
+    box-shadow: 0 4px 18px rgba(248, 200, 212, 0.3);
+  }
+
+  .card-title {
+    font-family: 'Frank Ruhl Libre', serif;
+    font-size: 1.15rem;
+    color: var(--dark);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-title::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background: var(--gold);
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* ADD EXPERIENCE */
+  .add-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .add-row input {
+    flex: 1;
+    padding: 12px 16px;
+    border: 1.5px solid var(--pink-deep);
+    border-radius: 12px;
+    font-family: 'Heebo', sans-serif;
+    font-size: 0.95rem;
+    color: var(--text);
+    background: var(--cream);
+    outline: none;
+    direction: rtl;
+    transition: border-color 0.2s;
+  }
+
+  .add-row input:focus { border-color: var(--gold); }
+
+  .add-row input::placeholder { color: #bbb; }
+
+  .btn-add {
+    padding: 12px 18px;
+    background: var(--mint-deep);
+    border: none;
+    border-radius: 12px;
+    color: var(--dark);
+    font-size: 1.3rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 700;
+  }
+
+  .btn-add:hover { background: var(--gold); transform: scale(1.08); }
+
+  /* EXPERIENCES LIST */
+  .experiences-list { list-style: none; }
+
+  .exp-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    background: var(--cream);
+    margin-bottom: 9px;
+    border: 1px solid var(--pink);
+    transition: all 0.3s;
+    animation: slideIn 0.3s ease;
+  }
+
+  .exp-texts {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .exp-replacement {
+    font-size: 0.82rem;
+    color: var(--mint-deep);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .exp-replacement::before {
+    content: '↓';
+    color: var(--gold);
+    font-size: 0.8rem;
+  }
+
+  .rep-input {
+    border: none;
+    background: transparent;
+    color: var(--mint-deep);
+    font-family: 'Heebo', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 600;
+    width: 100%;
+    outline: none;
+    direction: rtl;
+    border-bottom: 1px dashed var(--mint-deep);
+    padding-bottom: 1px;
+  }
+
+  .rep-input::placeholder { color: #aaa; font-weight: 400; }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(-12px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  .exp-item.deleting {
+    animation: deleteAnim 0.6s forwards;
+  }
+
+  @keyframes deleteAnim {
+    0% { opacity: 1; transform: scaleY(1); }
+    50% { opacity: 0.5; background: var(--pink); }
+    100% { opacity: 0; transform: scaleY(0); height: 0; padding: 0; margin: 0; }
+  }
+
+  .exp-text {
+    font-size: 0.97rem;
+    color: var(--text);
+    font-weight: 400;
+  }
+
+  .btn-delete {
+    padding: 6px 14px;
+    background: var(--pink-deep);
+    border: none;
+    border-radius: 8px;
+    color: var(--dark);
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+    margin-right: 8px;
+    font-family: 'Heebo', sans-serif;
+  }
+
+  .btn-delete:hover { background: #e07080; color: #fff; }
+
+  /* DELETE MESSAGE FEED */
+  .delete-feed {
+    min-height: 30px;
+  }
+
+  .delete-msg {
+    background: var(--mint);
+    border: 1px solid var(--mint-deep);
+    border-right: 4px solid var(--gold);
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    font-size: 0.92rem;
+    color: var(--dark);
+    animation: msgIn 0.5s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .del-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .del-line .icon { font-size: 1rem; }
+
+  .del-deleted { color: #c0555f; font-weight: 600; text-decoration: line-through; opacity: 0.8; }
+  .del-replaced { color: #2a8a6a; font-weight: 700; font-size: 0.97rem; }
+
+  @keyframes msgIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .delete-msg.fade-out {
+    animation: msgOut 0.5s forwards;
+  }
+
+  @keyframes msgOut {
+    to { opacity: 0; transform: translateY(-8px); height: 0; padding: 0; margin: 0; }
+  }
+
+  /* CLEAR ALL BTN */
+  .btn-clear-all {
+    display: block;
+    width: 100%;
+    padding: 13px;
+    background: var(--pink);
+    border: 1.5px solid var(--pink-deep);
+    border-radius: 12px;
+    color: var(--dark);
+    font-family: 'Heebo', sans-serif;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 10px;
+    letter-spacing: 1px;
+  }
+
+  .btn-clear-all:hover { background: var(--pink-deep); }
+
+  /* EMPTY STATE */
+  .empty-state {
+    text-align: center;
+    color: #bbb;
+    font-size: 0.88rem;
+    padding: 20px 0 10px;
+    letter-spacing: 1px;
+    display: none;
+  }
+
+  /* FOOTER */
+  .footer {
+    text-align: center;
+    margin-top: 40px;
+    color: var(--gold);
+    font-size: 0.8rem;
+    letter-spacing: 3px;
+    opacity: 0.7;
+  }
+</style>
+</head>
+<body>
+
+<div style="position:fixed; top:14px; right:18px; font-family:'Frank Ruhl Libre',serif; font-size:0.95rem; color:var(--gold); letter-spacing:1px; z-index:10;">בס״ד</div>
+
+<div class="container">
+
+  <div class="header">
+    <h1>ריפוי <span>תת המודע</span></h1>
+    <div class="divider"></div>
+    <p>✦ שחרור • ריפוי • חידוש ✦</p>
+  </div>
+
+  <!-- PHOTO -->
+  <div class="photo-section">
+    <div class="photo-frame" onclick="document.getElementById('photoInput').click()">
+      <img id="userPhoto" alt="תמונה שלך">
+      <div class="photo-placeholder" id="photoPlaceholder">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="12" cy="8" r="4"/>
+          <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+        </svg>
+        <span>הוסף תמונה</span>
+      </div>
+    </div>
+    <input type="file" id="photoInput" accept="image/*">
+    <label class="photo-label" onclick="document.getElementById('photoInput').click()">
+      העלה תמונה שלך ✦
+    </label>
+  </div>
+
+  <!-- SUBCONSCIOUS BUTTON -->
+  <button class="subconscious-btn" onclick="enterSubconscious()">
+    כניסה אל תת המודע
+  </button>
+
+  <!-- EXPERIENCES CARD -->
+  <div class="card">
+    <div class="card-title">חוויות לשחרור</div>
+
+    <div class="add-row">
+      <input type="text" id="expInput" placeholder="חוויה למחיקה..." onkeydown="if(event.key==='Enter') addExperience()">
+      <button class="btn-add" onclick="addExperience()">+</button>
+    </div>
+    <div class="add-row" style="margin-top:-8px; margin-bottom:18px;">
+      <input type="text" id="repInput" placeholder="מה מחליף אותה? (אופציונלי)" style="font-size:0.85rem; background:#f0faf6; border-color:var(--mint-deep);">
+    </div>
+
+    <ul class="experiences-list" id="expList"></ul>
+    <div class="empty-state" id="emptyState">לא נמצאו חוויות. הוסף חוויה כדי להתחיל.</div>
+
+    <div style="display:flex; gap:10px; margin-top:10px;">
+      <button class="btn-clear-all" onclick="clearAll()" style="flex:1;">מחק את כל החוויות</button>
+      <button class="btn-clear-all" onclick="resetAll()" style="flex:1; background:var(--mint); border-color:var(--mint-deep);">↺ אפס הכל</button>
+    </div>
+  </div>
+
+  <!-- DELETE FEED CARD -->
+  <div class="card" id="feedCard" style="display:none;">
+    <div class="card-title">הודעות שחרור</div>
+    <div class="delete-feed" id="deleteFeed"></div>
+  </div>
+
+  <div class="footer">✦ &nbsp; נאירה דיגיטל &nbsp; ✦</div>
+
+</div>
+
+<!-- SUBCONSCIOUS OVERLAY -->
+<div class="subconscious-overlay" id="subconsciousOverlay">
+  <img class="sub-photo" id="subPhoto" alt="">
+  <div class="sub-title">✦ ברוכה הבאה אל תת המודע שלך ✦</div>
+  <div class="sub-subtitle">
+    כאן מתרחש הריפוי האמיתי<br>
+    שחרר, סלח, וחדש את עצמך<br>
+    <br>
+    כל חוויה שמחקת — שוחררה לנצח
+  </div>
+  <button class="close-overlay-btn" onclick="closeSubconscious()">תחילת הריפוי ✦</button>
+</div>
+
+<script>
+function resetAll() {
+  alert('הרשימה אופסה לברירת המחדל');
+  document.getElementById('expList').innerHTML = '';
+  defaultExperiences.forEach(([exp, rep]) => addExperienceItem(exp, rep));
+  document.getElementById('deleteFeed').innerHTML = '';
+  document.getElementById('feedCard').style.display = 'none';
+  updateEmptyState();
+}
+
+function clearAll() {
+  if (confirm('האם אתה בטוח שברצונך למחוק את כל החוויות?')) {
+    const items = [...document.querySelectorAll('.exp-item')];
+    items.forEach(item => {
+      const text = item.querySelector('.exp-text').textContent;
+      const rep = item.querySelector('.rep-input') ? item.querySelector('.rep-input').value : '';
+      triggerDeleteAnim(item, text, rep);
+    });
+  }
+}
+
+// Photo upload
+document.getElementById('photoInput').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    const img = document.getElementById('userPhoto');
+    img.src = ev.target.result;
+    img.style.display = 'block';
+    document.getElementById('photoPlaceholder').style.display = 'none';
+    document.getElementById('subPhoto').src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+});
+
+// Default experiences [experience, replacement, gender: 'f'=feminine 'm'=masculine]
+const defaultExperiences = [
+  ['חוויית הנטישה',                          'שייכות ואהבה',                                    'f'],
+  ['פחד להיות לבד',                           'זוגיות שלמה עם עצמי',                             'm'],
+  ['פחד לאבד',                                'הקב״ה איתי',                                      'm'],
+  ['פחד מכישלון',                             'אמון בהצלחה ובצמיחה',                             'm'],
+  ['ריצוי',                                   'גבולות בריאים ויציבות במקומי',                    'm'],
+  ['הערכה עצמית נמוכה',                       'הערכה עצמית גבוהה',                               'f'],
+  ['ביטחון עצמי נמוך',                        'ביטחון עצמי גבוה',                                'm'],
+  ['בחירת הזוגיות שאינה מיטיבה עמי',          'בחירת זוגיות אמיתית ונכונה עבורי',               'f'],
+  ['שחזור החוויות הזוגיות',                   'שבירת שחזור ויצירת מעגל חדש של אהבה אמיתית',     'm'],
+  ['היקשרות נמנעת',                           'היקשרות בטוחה',                                   'f'],
+  ['היקשרות חרדתית',                          'היקשרות בטוחה',                                   'f'],
+];
+
+defaultExperiences.forEach(([exp, rep]) => addExperienceItem(exp, rep));
+updateEmptyState();
+
+function addExperience() {
+  const input = document.getElementById('expInput');
+  const repInput = document.getElementById('repInput');
+  const val = input.value.trim();
+  if (!val) return;
+  const rep = repInput.value.trim() || autoReplacement(val);
+  addExperienceItem(val, rep);
+  input.value = '';
+  repInput.value = '';
+  updateEmptyState();
+}
+
+function autoReplacement(text) {
+  let t = text.trim();
+  if (t.includes('נמוכה')) return t.replace('נמוכה', 'גבוהה');
+  if (t.includes('נמוך')) return t.replace('נמוך', 'גבוה');
+  if (t.startsWith('פחד מ') || t.startsWith('הפחד מ')) return 'אמון בהצלחה ובצמיחה';
+  if (t.startsWith('פחד ל') || t.startsWith('הפחד ל')) return 'אומץ ובטחון';
+  if (t.includes('כישלון')) return t.replace('כישלון', 'הצלחה');
+  if (t.includes('דחייה')) return t.replace('דחייה', 'קבלה');
+  if (t.includes('בדידות')) return t.replace('בדידות', 'חיבור');
+  if (t.includes('כעס')) return t.replace('כעס', 'שלווה');
+  if (t.includes('עצב')) return t.replace('עצב', 'שמחה');
+  if (t.includes('חרדה')) return t.replace('חרדה', 'רוגע');
+  if (t.includes('פחד')) return t.replace('פחד', 'אומץ');
+  return 'אהבה עצמית ושלווה פנימית';
+}
+
+function escapeAttr(str) {
+  return (str || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function addExperienceItem(text, replacement) {
+  const li = document.createElement('li');
+  li.className = 'exp-item';
+  li.innerHTML = `
+    <div class="exp-texts">
+      <span class="exp-text">${text}</span>
+      <span class="exp-replacement">
+        <input class="rep-input" value="${escapeAttr(replacement)}" placeholder="הכנס תחליף...">
+      </span>
+    </div>
+    <button class="btn-delete" onclick="deleteExperience(this)">מחק ✦</button>
+  `;
+  document.getElementById('expList').appendChild(li);
+  updateEmptyState();
+}
+
+function deleteExperience(btn) {
+  const item = btn.closest('.exp-item');
+  const text = item.querySelector('.exp-text').textContent;
+  const rep = item.querySelector('.rep-input').value;
+  triggerDeleteAnim(item, text, rep);
+}
+
+function triggerDeleteAnim(item, text, rep) {
+  item.classList.add('deleting');
+  setTimeout(() => {
+    item.remove();
+    updateEmptyState();
+  }, 600);
+  showDeleteMessage(text, rep);
+}
+
+function showDeleteMessage(text, rep) {
+  const feedCard = document.getElementById('feedCard');
+  feedCard.style.display = 'block';
+
+  const { deleted, replaced } = buildDeleteMessage(text, rep);
+  const feed = document.getElementById('deleteFeed');
+  const el = document.createElement('div');
+  el.className = 'delete-msg';
+  el.innerHTML = `
+    <div class="del-line">
+      <span class="icon">🗑</span>
+      <span class="del-deleted">${deleted}</span>
+    </div>
+    <div class="del-line">
+      <span class="icon">✨</span>
+      <span class="del-replaced">${replaced}</span>
+    </div>
+  `;
+  feed.insertBefore(el, feed.firstChild);
+
+  setTimeout(() => {
+    el.classList.add('fade-out');
+    setTimeout(() => {
+      el.remove();
+      if (feed.children.length === 0) feedCard.style.display = 'none';
+    }, 500);
+  }, 8000);
+}
+
+// Gender dictionary for known first words
+const feminineWords = ['חוויית','היקשרות','ההיקשרות','בחירת','הערכה','שלווה','נטישה','אהבה'];
+const masculineWords = ['פחד','הפחד','ריצוי','הריצוי','ביטחון','שחזור','כעס','עצב','פחד'];
+
+function buildDeleteMessage(text, rep) {
+  const t = text.trim();
+  const firstWord = t.split(' ')[0];
+  const lastChar = t.slice(-1);
+
+  let isFeminine = false;
+  if (feminineWords.includes(firstWord)) isFeminine = true;
+  else if (masculineWords.includes(firstWord)) isFeminine = false;
+  else isFeminine = (lastChar === 'ה' || t.endsWith('ות') || t.endsWith('ת'));
+
+  const deletedSuffix = isFeminine ? 'נמחקה' : 'נמחק';
+  const replacement = rep && rep.trim() ? rep.trim() : autoReplacement(t);
+
+  return {
+    deleted: `${t} ${deletedSuffix} מתת המודע`,
+    replaced: replacement
+  };
+}
+
+function updateEmptyState() {
+  const list = document.getElementById('expList');
+  const empty = document.getElementById('emptyState');
+  empty.style.display = list.children.length === 0 ? 'block' : 'none';
+}
+
+function enterSubconscious() {
+  const overlay = document.getElementById('subconsciousOverlay');
+  overlay.classList.add('active');
+  const subPhoto = document.getElementById('subPhoto');
+  subPhoto.style.display = subPhoto.src && subPhoto.src !== window.location.href ? 'block' : 'none';
+}
+
+function closeSubconscious() {
+  document.getElementById('subconsciousOverlay').classList.remove('active');
+}
+</script>
+</body>
+</html>
